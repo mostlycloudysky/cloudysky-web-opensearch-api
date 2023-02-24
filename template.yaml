@@ -19,27 +19,29 @@ Resources:
   ApiCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName: !Sub api-dev.cloudysky.link
+      DomainName: !Sub api-prod.cloudysky.link
       ValidationMethod: DNS
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: dev
-      Cors: "'www.cloudysky.link'"
-      CacheClusterEnabled: true
-      CacheClusterSize: '0.5'
-      MethodSettings:
-        - ResourcePath: /
-          HttpMethod: GET
-          CachingEnabled: true
-          CacheTtlInSeconds: 300
+      StageName: prod
+      Cors: "'*'"
       Domain:
-        DomainName: !Sub api-dev.cloudysky.link
+        DomainName: !Sub api-prod.cloudysky.link
         CertificateArn: !Ref ApiCertificate
         EndpointConfiguration: EDGE
         Route53:
           HostedZoneId: Z01798246FUPJEQVEZR8
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          # Quota:
+          #   Limit: 1000
+          #   Period: DAY
+          # Throttle:
+          #   RateLimit: 5
 
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -53,7 +55,7 @@ Resources:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /
+            Path: /search
             Method: get
             RestApiId:
               Ref: ApiGatewayApi
