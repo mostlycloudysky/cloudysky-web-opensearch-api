@@ -15,6 +15,32 @@ Globals:
     TracingEnabled: true
 
 Resources:
+
+  ApiCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub api-dev.cloudysky.link
+      ValidationMethod: DNS
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Cors: "'www.cloudysky.link'"
+      CacheClusterEnabled: true
+      CacheClusterSize: '0.5'
+      MethodSettings:
+        - ResourcePath: /
+          HttpMethod: GET
+          CachingEnabled: true
+          CacheTtlInSeconds: 300
+      Domain:
+        DomainName: !Sub api-dev.cloudysky.link
+        CertificateArn: !Ref ApiCertificate
+        EndpointConfiguration: EDGE
+        Route53:
+          HostedZoneId: Z01798246FUPJEQVEZR8
+
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -27,8 +53,10 @@ Resources:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /hello
+            Path: /
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -56,7 +84,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   HelloWorldApi:
     Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
   HelloWorldFunction:
     Description: Hello World Lambda Function ARN
     Value: !GetAtt HelloWorldFunction.Arn
