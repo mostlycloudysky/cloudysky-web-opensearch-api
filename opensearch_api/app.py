@@ -33,8 +33,16 @@ def lambda_handler(event, context):
         connection_string = get_connection_string()
         client = OpenSearch([connection_string])
         response = client.search(index=index, body={
-            "query": { "match_phrase_prefix": { "title": {
-                "query": data, "slop": 3, "max_expansions": 5} } }")
+            "query": {
+                "match_phrase_prefix": {
+                    "title": {
+                        "query": data,
+                        "slop": 3,
+                        "max_expansions": 10,
+                    }
+                }
+            }       
+        })
         return response
         
     response = search_documents(queryString)   
