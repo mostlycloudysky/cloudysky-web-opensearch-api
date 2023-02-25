@@ -45,14 +45,23 @@ def lambda_handler(event, context):
         })
         return response
         
-    response = search_documents(queryString)   
-    print(response) 
-    
-
-    
-    return {
+    response_data = search_documents(queryString)   
+    hits = response_data['hits']['hits']
+        
+    response = {
         "statusCode": 200,
-        "body": json.dumps({
-            "message": queryString,
-        }),
+        "headers": {
+            "Access-Control-Allow-Origin": '*'
+        },
+        "isBase64Encoded": False
     }
+    
+    response['body'] = json.dumps(hits)
+    return response
+    
+    # return {
+    #     "statusCode": 200,
+    #     "body": json.dumps({
+    #         "message": queryString,
+    #     }),
+    # }
