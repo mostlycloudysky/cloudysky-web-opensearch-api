@@ -59,6 +59,10 @@ Resources:
             Method: get
             RestApiId:
               Ref: ApiGatewayApi
+      Policies:
+        - AmazonOpenSearchServiceFullAccess 
+        - CloudWatchPutMetricPolicy: {}
+        - SecretsManagerReadWrite
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
