@@ -3,6 +3,8 @@ import boto3
 from opensearchpy import OpenSearch, helpers
 
 
+
+
 def lambda_handler(event, context):
     
     domain_endpoint = 'search-cloudysky-opensearch-pj37jyxci4bp3x4f2whstjdrx4.us-east-1.es.amazonaws.com'
