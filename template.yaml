@@ -69,6 +69,7 @@ Resources:
         - AmazonOpenSearchServiceFullAccess 
         - CloudWatchPutMetricPolicy: {}
         - SecretsManagerReadWrite
+        - AmazonSSMReadOnlyAccess
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
