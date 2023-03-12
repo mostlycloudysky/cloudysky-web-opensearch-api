@@ -59,11 +59,16 @@ def lambda_handler(event, context):
 
     redis_client = redis.Redis(
         host=redis_host, port=redis_port, password=redis_password, ssl=True)
-    redis_client.set('mykey', 'myvalue')
-    result = redis_client.get('mykey')
-    print(result)
-    response_data = search_documents(queryString)
-    hits = response_data['hits']['hits']
+
+    print('Type of redis_client: ', type(queryString))
+
+    if redis_client.exists(queryString):
+        results = redis_client.get(queryString)
+        results = json.loads(results)
+        print('no need to search')
+    else:
+        response_data = search_documents(queryString)
+        results = response_data['hits']['hits']
 
     response = {
         "statusCode": 200,
@@ -73,7 +78,9 @@ def lambda_handler(event, context):
         "isBase64Encoded": False
     }
 
-    response['body'] = json.dumps(hits)
+    response['body'] = json.dumps(results)
+    redis_client.set(queryString, response['body'])
+    redis_client.expire(queryString, 600)
     return response
 
     # return {
