@@ -79,8 +79,9 @@ def lambda_handler(event, context):
     }
 
     response['body'] = json.dumps(results)
-    redis_client.set(queryString, response['body'])
-    redis_client.expire(queryString, 600)
+    if response['body'] != '[]':
+        redis_client.set(queryString, response['body'])
+    # redis_client.expire(queryString, 600)
     return response
 
     # return {
